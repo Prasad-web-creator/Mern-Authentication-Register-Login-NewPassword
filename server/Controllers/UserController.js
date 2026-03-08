@@ -24,7 +24,7 @@ exports.register = async(req,res)=>{
         const salt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(password,salt)
 
-        const matchOTP =  otp_match(otp_store.email,otp)
+        const matchOTP =  otp_match(otp_store[email],otp)
 
 
         if(!matchOTP){
@@ -67,7 +67,7 @@ exports.getOtp = (req,res)=>{
 
     try{
 
-        otp_store.email = gen_otp
+        otp_store[email] = gen_otp
         
         sentEmail(email,
             "Otp for your registration in mern-auth",
@@ -129,7 +129,7 @@ exports.resetPassword = (req,res)=>{
 
         const reset_otp = genOtp()
 
-        reset_store.email = reset_otp
+        reset_store[email] = reset_otp
 
         sentEmail(email,
             "Reset password OTP for Mern-Auth",
@@ -176,7 +176,7 @@ exports.otpVerify = (req,res)=>{
             return res.status(401).json({message:"All fields are required"})
         }
 
-        const matchOTP =  otp_match(reset_store.email,otp)
+        const matchOTP =  otp_match(reset_store[email],otp)
 
         if(!matchOTP){
             return res.status(401).json({message:"Invalid Otp"})
