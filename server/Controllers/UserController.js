@@ -56,7 +56,7 @@ function otp_match(otp,user_otp){
     return false
 }
 
-exports.getOtp = (req,res)=>{
+exports.getOtp = async (req,res)=>{
 
     const {email} = req.body
     const gen_otp = genOtp()
@@ -69,7 +69,7 @@ exports.getOtp = (req,res)=>{
 
         otp_store[email] = gen_otp
         
-        sentEmail(email,
+        await sentEmail(email,
             "Otp for your registration in mern-auth",
             `Your 6 digit OTP is ${gen_otp}`
         )
@@ -135,13 +135,13 @@ exports.resetPassword = async (req,res)=>{
 
         reset_store[email] = reset_otp
 
-        const state = await sentEmail(email,
+        await sentEmail(email,
             "Reset password OTP for Mern-Auth",
             `Your OTP for reset password ${reset_otp}`
         )
 
-        if(state) return res.status(201).json({message:"Reset password otp is sent to your email"})
-        else return res.status(201).json({message:"Failed to send OTP"})
+        return res.status(201).json({message:"Reset password otp is sent to your email"})
+        
 
     }catch(err){
         return res.status(500).json({message:"Server Connection Failed"})
@@ -167,7 +167,7 @@ exports.newPassword = async(req,res)=>{
 
         await UserModel.findOneAndUpdate({email},{password:hashPassword})
         
-        return res.status(401).json({message:"Password Changed Successfully"})
+        return res.status(201).json({message:"Password Changed Successfully"})
     }catch(err){
         return res.status(500).json({message:"Server Connection Failed"})
     }

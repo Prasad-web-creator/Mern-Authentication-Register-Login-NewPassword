@@ -6,15 +6,13 @@ const sendEmail = async (to, subject, text) => {
     
     const transporter = nodemailer.createTransport({
       host:'smtp.gmail.com',
-      port:465,
-      secure:true,
+      port:587,
+      secure:false,
       family: 4,
+      requireTLS: true,
       auth:{
         user:process.env.EMAIL_ADMIN,
         pass : process.env.EMAIL_PASSWORD
-      },
-      tls: {
-        rejectUnauthorized: false
       }
     })
 
@@ -24,8 +22,6 @@ const sendEmail = async (to, subject, text) => {
       subject:subject,
       text:text
     })
-
-    return true
 
   } catch (err) {
     console.log("Email error:", err.message)
