@@ -58,7 +58,7 @@ export default function Login() {
             <form onSubmit={handleSubmit}>
                 <input type="email" placeholder='Email' name='email' value={user.email} onChange={handleChange} required/><br />
                 <input type="password" placeholder='Password' name='password' value={user.password} onChange={handleChange} required/><br />
-                <Link to="/newpassword" className='text-font-blue link'>forget password?</Link><br />
+                <Link to="/new_password" className='text-font-blue link'>forget password?</Link><br />
                 <button type='submit'  className='signup-btn my-2'>Login</button><br />
                 <p className='text-gray text-center'>Don't have an account? <Link to="/register" className='text-font-blue'>Signup.</Link></p>
             </form>
