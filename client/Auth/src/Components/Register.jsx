@@ -12,16 +12,46 @@ export default function Register() {
         username : "", 
         email : "",
         password : "", 
-        otp : ""
     })
 
     const handleChange = (e)=>{
-        const {name,value} = e.target;
+        let {name,value} = e.target;
         setUser((prev)=>({...prev,[name]:value}));
+    }
+
+    function isValidUsername(username) {
+        const usernameRegex = /^(?=.{3,16}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/;
+        return usernameRegex.test(username);
+    }   
+
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function validatePassword(password) {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._]).{8,}$/;
+        return passwordRegex.test(password);
     }
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
+
+        if(!isValidUsername(user.username)){
+            alert("Username must be 3-16 characters long, can contain letters, numbers, underscores, and periods. It cannot start or end with an underscore or period, and cannot have consecutive underscores or periods.");
+            return;
+        }
+
+        if(!validateEmail(user.email)){
+            alert("Please enter a valid email address.");
+            return;
+        }
+
+        if(!validatePassword(user.password)){
+            alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+            return;
+        }
+        
         try{
             const response = await fetch(`${API}/api/auth/register`,{
                     method:'POST',
@@ -43,29 +73,6 @@ export default function Register() {
         }
 
 
-        const handleOtp = async (e)=>{
-        e.preventDefault();
-        try{
-            const response = await fetch(`${API}/api/auth/getotp`,{
-                    method:'POST',
-                    headers:{"Content-Type":"application/json"},
-                    body: JSON.stringify(user)
-                })
-
-            if (!response.ok) alert("Server connection failed")
-
-            const data = await response.json()
-
-            console.log(data)
-
-            alert(data.message);
-
-
-            }catch(error){
-                alert("Server Could not Reached")
-            }
-        }
-
   return (
     <>
         <BrandBar/>
@@ -76,9 +83,7 @@ export default function Register() {
                 <input type="text" placeholder='Full Name' name='username' value={user.username} onChange={handleChange} required/><br />
                 <input type="email" placeholder='Email' name='email' value={user.email} onChange={handleChange} required/><br />
                 <input type="password" placeholder='Password' name='password' value={user.password} onChange={handleChange} required/><br />
-                <input  type="tel" placeholder='otp' maxLength={6} name='otp' value={user.otp} onChange={handleChange} required/>
-                <button type="button" onClick={handleOtp} className='signup-btn my-2'>Get Otp</button><br />
-                <Link to="/resetpassword" className='text-font-blue link'>forget password?</Link><br />
+                <Link to="/new_password" className='text-font-blue link'>forget password?</Link><br />
                 <button type='submit' className='signup-btn my-2'>Sign Up</button><br />
                 <p className='text-gray text-center'>Already have an account? <Link to="/login" className='text-font-blue'>Login here.</Link></p>
             </form>

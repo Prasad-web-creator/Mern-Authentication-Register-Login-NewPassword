@@ -2,16 +2,12 @@
 const jwt = require('jsonwebtoken')
 const UserModel = require('../Models/UserModel')
 const bcrypt = require('bcryptjs')
-const sentEmail = require('../Utils/sendEmail')
-
-let otp_store = {}
-let reset_store = {}
 
 exports.register = async(req,res)=>{
     try{
-        const {username,email,password,otp} = req.body
+        const {username,email,password} = req.body
 
-        if(!username || !email || !password || !otp){
+        if(!username || !email || !password ){
             return res.status(401).json({message:"All fields are required"})
         }
 
@@ -24,13 +20,6 @@ exports.register = async(req,res)=>{
         const salt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(password,salt)
 
-        const matchOTP =  otp_match(otp_store[email],otp)
-
-
-        if(!matchOTP){
-            return res.status(401).json({message:"Invalid Otp"})
-        }
-
         await UserModel.create({
             username,
             email,
@@ -38,54 +27,12 @@ exports.register = async(req,res)=>{
         })
 
         return res.status(201).json({message:"User Registeration Successful"})
-    }catch(err){
-        return res.status(500).json({message:"Server Connection Failed"})
-    }
-}
-
-function genOtp(){
-    const otp = Math.floor(100000 + Math.random() * 900000)
-    return otp
-}
-
-
-function otp_match(otp,user_otp){
-    if(otp==user_otp){
-        return true
-    }
-    return false
-}
-
-exports.getOtp = async (req,res)=>{
-
-    const {email} = req.body
-    const gen_otp = genOtp()
-
-    if(!email){
-        return res.status(201).json({message:"All fields are required"})
-    }
-
-    try{
-
-        otp_store[email] = gen_otp
-        
-        const ok = await sentEmail(email,
-            "Otp for your registration in mern-auth",
-            `Your 6 digit OTP is ${gen_otp}`
-        )
-
-        console.log(ok)
-
-        if(!ok){
-            return res.status(500).json({ message: "Failed to send OTP email" })
-        }
-        
-        return res.status(201).json({message:"Otp is sent to your email"})
 
     }catch(err){
         return res.status(500).json({message:"Server Connection Failed"})
     }
 }
+
 
 exports.login = async(req,res)=>{
     try{
@@ -128,35 +75,6 @@ exports.login = async(req,res)=>{
 }
 
 
-exports.resetPassword = async (req,res)=>{
-    try{
-        const {email} = req.body
-
-        if(!email){
-            return res.status(400).json({message:"All fields are required"})
-        }
-
-        const reset_otp = genOtp()
-
-        reset_store[email] = reset_otp
-
-        const ok = await sentEmail(email,
-            "Reset password OTP for Mern-Auth",
-            `Your OTP for reset password ${reset_otp}`
-        )
-
-        if(!ok){
-            return res.status(500).json({ message: "Failed to send OTP email" })
-        }
-        
-        return res.status(201).json({message:"Reset password otp is sent to your email"})
-        
-
-    }catch(err){
-        return res.status(500).json({message:"Server Connection Failed"})
-    }
-}
-
 exports.newPassword = async(req,res)=>{
     try{
         const {email,password} = req.body
@@ -177,27 +95,6 @@ exports.newPassword = async(req,res)=>{
         await UserModel.findOneAndUpdate({email},{password:hashPassword})
         
         return res.status(201).json({message:"Password Changed Successfully"})
-    }catch(err){
-        return res.status(500).json({message:"Server Connection Failed"})
-    }
-}
-
-exports.otpVerify = (req,res)=>{
-    try{
-        const {email,otp} = req.body
-
-        if(!email || !otp){
-            return res.status(401).json({message:"All fields are required"})
-        }
-
-        const matchOTP =  otp_match(reset_store[email],otp)
-
-        if(!matchOTP){
-            return res.status(401).json({message:"Invalid Otp"})
-        }
-
-        return res.status(401).json({message:"Otp verified"})
-
     }catch(err){
         return res.status(500).json({message:"Server Connection Failed"})
     }

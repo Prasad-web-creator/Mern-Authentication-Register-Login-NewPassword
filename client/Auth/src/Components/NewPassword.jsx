@@ -14,9 +14,31 @@ export default function NewPassword() {
           const {name,value} = e.target;
           setUser((prev)=>({...prev,[name]:value}));
       }
+
+      function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function validatePassword(password) {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._]).{8,}$/;
+        return passwordRegex.test(password);
+    }
+
   
       const handleSubmit = async (e)=>{
           e.preventDefault();
+
+            if(!validateEmail(user.email)){
+                alert("Please enter a valid email address.");
+                return;
+            }
+
+            if(!validatePassword(user.password)){
+                alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+                return;
+            }
+
           try{
               const response = await fetch(`${API}/api/auth/newpassword/`,{
                       method:'POST',

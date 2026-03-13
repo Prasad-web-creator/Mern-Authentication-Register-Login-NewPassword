@@ -1,7 +1,7 @@
 
 const UserModel = require('../Models/UserModel')
 const express = require('express')
-const {register,login,getOtp,newPassword,resetPassword,otpVerify} = require('../Controllers/UserController')
+const {register,login,newPassword} = require('../Controllers/UserController')
 const authMiddleware = require('../Middlewares/authMiddleware')
 
 
@@ -18,9 +18,6 @@ router.get('/profile',authMiddleware,async (req,res)=>{
 
 router.post('/register',register)
 router.post('/login',login)
-router.post('/getotp',getOtp)
 router.post('/newpassword',newPassword)
-router.post('/resetpassword',resetPassword)
-router.post('/otpverify',otpVerify)
 
 module.exports = router
